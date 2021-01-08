@@ -36,7 +36,6 @@ const useStyles = makeStyles((theme) => ({
         minWidth: 120,
     }
 }));
-//FIXME: set up actual name and abbr
 const states = require('../JSON/states.json');
 
 export default function StateSelect({ state, callback }) {

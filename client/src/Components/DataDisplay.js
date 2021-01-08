@@ -73,7 +73,7 @@ export default function ResultsDrawer({ open, results, callback }) {
                     {results.map((row) => (
                         <TableRow key={row.name}>
                             <TableCell align="center">
-                                <Button onClick={toggleModal(row)} variant="contained" color="primary">
+                                <Button onClick={toggleModal(row)} variant="contained" color="info">
                                     {row.name}
                                 </Button>
                             </TableCell>

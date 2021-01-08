@@ -54,7 +54,7 @@ const District = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={toggle} color="primary">
+          <Button onClick={toggle} color="secondary" variant="contained">
             Done
           </Button>
         </DialogActions>

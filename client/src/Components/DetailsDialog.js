@@ -17,20 +17,40 @@ export default function DetailsDialog({ open, data, callback }) {
     callback(!open);
 };
 
+const Link = () => {
+    if (data.link) {
+        return (
+            <a href={data.link}>Go To Website</a>
+        );
+    }
+    return null;
+}
+
+const District = () => {
+    if (data.district) {
+        return (
+            <h4>District: {data.district}</h4>
+        );
+    }
+    return null;
+}
+
   return (
     <div>
       <Dialog
         open={open}
         TransitionComponent={Transition}
         keepMounted
-        onClose={toggle}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">{"Details"}</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-title">{data.name}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-           {data.name}
+           <District />
+           <h4>Office: {data.office}</h4>
+           <h4>Phone: {data.phone}</h4>
+           <Link />
           </DialogContentText>
         </DialogContent>
         <DialogActions>

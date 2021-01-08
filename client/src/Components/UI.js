@@ -60,7 +60,8 @@ const UI = () => {
                 setDataOpen(true);
             }
             else {
-                setResults(null);
+                setWarn("No Results");
+                setWOpen(true);
             }
         } catch (err) {
             console.error(err);
@@ -112,7 +113,7 @@ const UI = () => {
                         <Alert onClose={warningClose} severity="error">{warningMsg}</Alert>
                     </Snackbar>
                     <Box className={classes.grid}>
-                        <Button 
+                        <Button
                             variant="outlined"
                             color="primary"
                             onClick={handleSubmit}
@@ -120,7 +121,7 @@ const UI = () => {
                     </Box>
                 </Grid>
             </Box>
-            <DataDisplay results={results} open={dataOpen} callback={dataClose}/>
+            <DataDisplay results={results} open={dataOpen} callback={dataClose} />
         </div>
 
     );

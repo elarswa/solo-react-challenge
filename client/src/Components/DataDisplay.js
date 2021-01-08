@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import ExitIcon from '@material-ui/icons/ExitToApp';
 import {
     Button,
@@ -13,13 +13,30 @@ import {
 } from '@material-ui/core';
 import DetailsDialog from './DetailsDialog';
 
+const StyledTableCell = withStyles((theme) => ({
+    head: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    body: {
+      fontSize: 16,
+    },
+  }))(TableCell);
+
+  const StyledTableRow = withStyles((theme) => ({
+    root: {
+      '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+      },
+    },
+  }))(TableRow);
+
 const useStyles = makeStyles({
     list: {
         width: 250,
     },
     fullList: {
         width: 'auto',
-        backgroundColor: 'grey',
     },
 });
 
@@ -33,10 +50,13 @@ export default function ResultsDrawer({ open, results, callback }) {
     };
 
     const toggleModal = (data) => {
-        setModal(!modalOpen);
-        setModalData(data);
+        return function () { // prevent the onClick getting called on render
+            if (data) {
+                setModalData(data);
+            }
+            setModal(!modalOpen);
+        }
     }
-
     const list = () => (
         <div
             className={classes.fullList}
@@ -44,20 +64,20 @@ export default function ResultsDrawer({ open, results, callback }) {
         >
             <Table stickyHeader={true}>
                 <TableHead >
-                    <TableRow>
-                        <TableCell align="center">Name</TableCell>
-                        <TableCell align="center">Party</TableCell>
-                    </TableRow>
+                    <StyledTableRow >
+                        <StyledTableCell align="center">Name</StyledTableCell>
+                        <StyledTableCell align="left">Party</StyledTableCell>
+                    </StyledTableRow>
                 </TableHead>
                 <TableBody>
                     {results.map((row) => (
                         <TableRow key={row.name}>
                             <TableCell align="center">
-                                <Button onClick={toggleModal(row)} color="primary">
+                                <Button onClick={toggleModal(row)} variant="contained" color="primary">
                                     {row.name}
                                 </Button>
                             </TableCell>
-                            <TableCell align="center">{row.party}</TableCell>
+                            <TableCell align="left">{row.party}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -67,15 +87,15 @@ export default function ResultsDrawer({ open, results, callback }) {
 
     return (
         <div>
+            <DetailsDialog open={modalOpen} data={modalData} callback={toggleModal(null)} />
             <Drawer
                 anchor="bottom"
                 open={open}
-            // variant="persistent"
+                variant="persistent"
             >
                 <IconButton onClick={toggle}><ExitIcon /></IconButton>
                 {list()}
             </Drawer>
-            <DetailsDialog open={modalOpen} data={modalData} callback={toggleModal} />
         </div>
     );
 }

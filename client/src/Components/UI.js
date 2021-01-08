@@ -1,18 +1,28 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Radio from '@material-ui/core/Radio';
+import MuiAlert from '@material-ui/lab/Alert';
+import {
+    Grid,
+    Snackbar,
+    Button,
+    Box,
 
+} from '@material-ui/core';
+
+import RepSelect from './RepSelect';
+import StateSelect from './StateSelect';
+import DataDisplay from './DataDisplay';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.paper
+        backgroundColor: theme.palette.background.paper,
+        justifyContent: 'center',
     },
     paper: {
         padding: theme.spacing(2),
@@ -23,8 +33,10 @@ const useStyles = makeStyles((theme) => ({
         margin: 'auto',
     },
     grid: {
+        justifyContent: 'center',
+        display: 'flex',
         margin: 'auto',
-        padding: theme.spacing(4),
+        padding: 10,
     },
 }));
 
@@ -32,16 +44,20 @@ const useStyles = makeStyles((theme) => ({
 const UI = () => {
     const classes = useStyles();
     const [state, setState] = useState("");
-    const [rep, setRep] = useState("senators");
+    const [rep, setRep] = useState("");
     const [results, setResults] = useState([]);
+    const [wOpen, setWOpen] = useState(false);
+    const [dataOpen, setDataOpen] = useState(false);
+    const [warningMsg, setWarn] = useState("");
 
-    const url = "https://localhost:3001";
+    const url = "http://localhost:3001";
     const backendTarget = `${url}/${rep}/${state}`;
     const getData = async () => {
         try {
             const res = await axios.get(backendTarget);
             if (res.data.success) {
                 setResults(res.data.results);
+                setDataOpen(true);
             }
             else {
                 setResults(null);
@@ -51,49 +67,63 @@ const UI = () => {
         }
     };
 
-    const handleRadio = (event) => {
-        console.log(`RepType was ${rep}`);
-        setRep(event.target.value);
-        console.log(`RepType changed to ${rep}`);
+    const getRepSelect = (val) => {
+        setRep(val);
+    }
+    const getStateSelect = (val) => {
+        setState(val);
+    }
+
+    const warningClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setWOpen(false);
+    }
+
+    const handleSubmit = () => {
+        if (rep === "") {
+            setWarn("Please select Senate or House");
+            setWOpen(true);
+        } else if (state === "") {
+            setWarn("Please select a State");
+            setWOpen(true);
+        } else {
+            getData();
+        }
+    }
+
+    const dataClose = () => {
+        setDataOpen(false);
     }
 
     return (
         <div className={classes.root}>
-            <header>
+            <header className="App-header">
                 <h1>Who's My Representative?</h1>
             </header>
-            <Grid container className={classes.grid} spacing={2}>
-                <Grid container item xs={12} spacing={3} direction="row" justify="space-evenly">
-                    <PaperRadio />
+            <Box className={classes.grid}>
+                <Grid className={classes.grid} container spacing={2}>
+                    <Grid container item xs={12} spacing={3} direction="row" justify="space-evenly">
+                        <RepSelect rep={rep} callback={getRepSelect} />
+                        <StateSelect state={state} callback={getStateSelect} />
+                    </Grid>
+                    <Snackbar open={wOpen} autoHideDuration={5000} onClose={warningClose}>
+                        <Alert onClose={warningClose} severity="error">{warningMsg}</Alert>
+                    </Snackbar>
+                    <Box className={classes.grid}>
+                        <Button 
+                            variant="outlined"
+                            color="primary"
+                            onClick={handleSubmit}
+                        >Submit</Button>
+                    </Box>
                 </Grid>
-            </Grid>
+            </Box>
+            <DataDisplay results={results} open={dataOpen} callback={dataClose}/>
         </div>
 
     );
-
-
-    function PaperRadio() {
-        return (
-            <React.Fragment>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>
-                        <FormLabel>Select Representative Type</FormLabel>
-                        <RadioGroup
-                            aria-label="legType"
-                            name="repType"
-                            onChange={handleRadio}
-                            value={rep}
-                            
-                        >
-                            <FormControlLabel value="senators" control={<Radio />} label="Senate" />
-                            <FormControlLabel value="representatives" control={<Radio />} label="House" />
-                        </RadioGroup>
-                    </Paper>
-                </Grid>
-            </React.Fragment>
-        );
-    }
-
 };
 
 
